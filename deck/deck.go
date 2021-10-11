@@ -1,44 +1,64 @@
+//go:generate stringer -type=Suit,Rank
 package deck
 
-import (
-	"fmt"
+import "fmt"
+
+type Suit uint8
+
+const (
+	Spade Suit = iota
+	Diamond
+	Club
+	Heart
+	Joker
+)
+
+var suits = [...]Suit{Spade, Diamond, Club, Heart}
+
+type Rank uint8
+
+const (
+	_ Rank = iota
+	Ace
+	Two
+	Three
+	Four
+	Five
+	Six
+	Seven
+	Eight
+	Nine
+	Ten
+	Jack
+	Queen
+	King
+)
+const (
+	maxRank = King
+	minRank = Ace
 )
 
 type Card struct {
-	Shape  string
-	Number string
+	Suit
+	Rank
 }
 
-func NewCard(shape string, number string) Card {
-	return Card{
-		Shape:  shape,
-		Number: number,
+func (c Card) String() string {
+	if c.Suit == Joker {
+		return c.Suit.String()
 	}
+	return fmt.Sprintf("%s of %ss", c.Rank, c.Suit)
 }
 
-func Suit(shape string) []Card {
-	var ret []Card
-	a := []string{"A", "J", "K", "Q"}
+//to do add options
+//eg shuffling etc
+func New() []Card {
+	var cards []Card
 
-	for i := 2; i <= 10; i++ {
-		ret = append(ret, NewCard(shape, fmt.Sprintf("%v", i)))
-
-	}
-	for _, letter := range a {
-		ret = append(ret, NewCard(shape, letter))
-	}
-
-	return ret
-}
-func NewDeck() [][]Card {
-	var deck [][]Card
-	var shapes = []string{"Diamond", "Heart", "Spade", "Flower"}
-	counter := 0
-	for _, shape := range shapes {
-		if counter <=3 {
-			deck = append(deck, Suit(shape))
-			counter++
+	for _, suit := range suits {
+		for rank := minRank; rank <= maxRank; rank++ {
+			cards = append(cards, Card{Suit: suit, Rank: rank})
 		}
 	}
-	return deck
+	return cards
 }
