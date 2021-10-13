@@ -42,3 +42,9 @@ func TestNew(t *testing.T) {
 		}
 	}
 }
+func TestDefaultSort(t *testing.T) {
+	cards := New(DefaultSort)
+	if (cards[0] != Card{Rank: Ace, Suit: Spade}) {
+		t.Error("Expected Ace of Spades as first card, Received", cards[0])
+	}
+}

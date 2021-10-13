@@ -1,7 +1,10 @@
 //go:generate stringer -type=Suit,Rank
 package deck
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type Suit uint8
 
@@ -52,7 +55,8 @@ func (c Card) String() string {
 
 //to do add options
 //eg shuffling etc
-func New() []Card {
+//we use functional options
+func New(opts ...func([]Card) []Card) []Card {
 	var cards []Card
 
 	for _, suit := range suits {
@@ -60,5 +64,34 @@ func New() []Card {
 			cards = append(cards, Card{Suit: suit, Rank: rank})
 		}
 	}
+	for _, opt := range opts {
+		opt(cards)
+	}
+
 	return cards
+}
+
+//DefaultSort takes a slice of cards as an argument and returns a slice that is sorted
+func DefaultSort(cards []Card) []Card {
+	sort.Slice(cards, Less(cards))
+	return cards
+}
+
+//Sort is a generic function that allows the user to sort the cards using a generic function
+func Sort(less func(cards []Card) func(i, j int) bool) func(cards []Card) []Card {
+	return func(cards []Card) []Card {
+		sort.Slice(cards, less(cards))
+		return cards
+	}
+}
+
+//Less takes in slice of cards and returns a function that compares the cards at the indicies of its arguments.
+func Less(cards []Card) func(i, j int) bool {
+
+	return func(i, j int) bool {
+		return absRank(cards[i]) < absRank(cards[j])
+	}
+}
+func absRank(c Card) int {
+	return int(c.Suit)*int(maxRank) + int(c.Rank)
 }
